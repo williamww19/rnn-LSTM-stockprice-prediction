@@ -21,21 +21,25 @@ For different year splits, both a single layer LSTM model and a stacked LSTM mod
 <b>Model Results</b>
 
 <i>Split year – 2007</i>
+
 Firstly, the data is splitted in the way that data before 2007 are used for training and after for testing, which ends up with 6545 training data and 3045 testing data, the test size is approximately 30%.
 <img src="./images/Simple_LSTM_model_2007.png"> 
 <img src="./images/Stacked_LSTM_model_2007.png">
  
 <i>Split year – 2011</i>
+
 Secondly, the data is splitted in the way that data before 2011 are used for training and after for testing, which ends up with 7553 training data and 2037 testing data, the test size is approximately 20%.
 <img src="./images/Simple_LSTM_model_2011.png"> 
 <img src="./images/Stacked_LSTM_model_2011.png">
 
  
 <i>Split year – 2015</i>
+
 Lastly, the data is splitted in the way that data before 2015 are used for training and after for testing, which ends up with 8589 training data and 1061 testing data, the test size is approximately 10%.
 <img src="./images/Simple_LSTM_model_2015.png"> 
 <img src="./images/Stacked_LSTM_model_2015.png">
  
+
 <b>Conclusion</b>
 
 The table below shows the performance of two models on different year split in terms of R-square and MSE.
