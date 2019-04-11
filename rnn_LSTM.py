@@ -1,6 +1,14 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Apr  8 09:21:39 2019
+
+@author: William Wei
+"""
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.preprocessing import MinMaxScaler
 from keras.models import Sequential
@@ -8,6 +16,7 @@ from keras.layers import Dense, LSTM
 import joblib
 
 pd.options.display.float_format = '{:.2f}'.format
+sns.set(rc={'figure.figsize':(30, 20)})
 
 aapl = pd.read_csv('AAPL.csv')
 
@@ -22,11 +31,14 @@ aapl[aapl.Open.isnull()] # the null value is on 1981-08-10
 aapl.fillna(method='ffill', inplace=True)
 aapl.set_index('Date', inplace=True)
 aapl.index = pd.to_datetime(aapl.index)
-aapl.Close.plot()
+aapl.Close.plot(title='Apple Inc. Historical Stock Price')
+
 # the data is from 1980 to 2019
-# split data into training and testing, split year is 2016
-training = aapl[:'2015'][['Close']]
-testing = aapl['2016':][['Close']]
+split_yr = 2007
+#split_yr = 2011
+#split_yr = 2015
+training = aapl[:str(split_yr-1)][['Close']]
+testing = aapl[str(split_yr):][['Close']]
 
 scl = MinMaxScaler()
 training_scl = scl.fit_transform(training)
@@ -59,16 +71,18 @@ def create_simple_model():
 
 def create_stacked_model():
     model = Sequential()
-    model.add(LSTM(units = 50, return_sequences = True, input_shape = (X_train.shape[1], 1)))
-    model.add(LSTM(units = 50, return_sequences = True))
+    model.add(LSTM(units = 50, return_sequences = True,
+                   input_shape = (X_train.shape[1], 1)))
     model.add(LSTM(units = 50, return_sequences = True))
     model.add(LSTM(units = 50))
     model.add(Dense(units = 1))
     return model
 
 def compile_and_run(model, epochs=50, batch_size=32):
-    model.compile(metrics=['accuracy'], optimizer='adam', loss='mean_squared_error')
-    history = model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size, verbose=3)
+    model.compile(metrics=['accuracy'], optimizer='adam',
+                  loss='mean_squared_error')
+    history = model.fit(X_train, y_train, epochs=epochs,
+                        batch_size=batch_size, verbose=3)
     return history
 
 def plot_metrics(history):
@@ -93,7 +107,7 @@ def make_predictions(X_test, layer='Simple'):
     plt.figtext(0.15, 0.8, 'mse: %.2f \nr_square: %.2f'%(mse, r2))
     plt.title('%s LSTM model'%layer)
     plt.legend()
-    plt.savefig('%s LSTM model.png'%layer)
+    plt.savefig('./images/%s_LSTM_model_%s.png'%(layer, split_yr))
 
 # prediction of single layer model
 simple_model = create_simple_model()
@@ -107,5 +121,5 @@ history = compile_and_run(stacked_model)
 plot_metrics(history)
 make_predictions(X_test, 'Stacked')
 
-joblib.dump(simple_model, 'simple_model.joblib')
-joblib.dump(stacked_model, 'stacked_model.joblib')
+joblib.dump(simple_model, 'simple_model_%s.joblib'%split_yr)
+joblib.dump(stacked_model, 'stacked_model_%s.joblib'%split_yr)
